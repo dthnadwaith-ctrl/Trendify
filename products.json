@@ -3,11 +3,11 @@
     "name": "Trendify",
     "tagline": "What's trending, delivered.",
     "sub": "Cash on delivery and UPI. Delivery across India in 5–10 days.",
-    "whatsapp": "919999999999",
-    "upi": "yourname@upi",
-    "freeAbove": 499,
+    "whatsapp": "919645088718",
+    "upi": "8547823395@fam",
+    "freeAbove": 399,
     "fee": 49,
-    "pin": "1234"
+    "pin": "3395"
   },
   "products": [
     { "id": 1, "name": "Wireless Earbuds", "price": 999, "mrp": 1999, "cat": "Gadgets", "img": "https://picsum.photos/seed/earbuds/500", "desc": "Bluetooth 5.3, 20h battery.", "stock": true },
