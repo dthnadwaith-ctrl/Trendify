@@ -1,0 +1,18 @@
+{
+  "settings": {
+    "name": "Trendify",
+    "tagline": "What's trending, delivered.",
+    "sub": "Cash on delivery and UPI. Delivery across India in 5–10 days.",
+    "whatsapp": "919999999999",
+    "upi": "yourname@upi",
+    "freeAbove": 499,
+    "fee": 49,
+    "pin": "1234"
+  },
+  "products": [
+    { "id": 1, "name": "Wireless Earbuds", "price": 999, "mrp": 1999, "cat": "Gadgets", "img": "https://picsum.photos/seed/earbuds/500", "desc": "Bluetooth 5.3, 20h battery.", "stock": true },
+    { "id": 2, "name": "Foldable Phone Stand", "price": 249, "mrp": 499, "cat": "Gadgets", "img": "https://picsum.photos/seed/stand/500", "desc": "Adjustable aluminium stand.", "stock": true },
+    { "id": 3, "name": "Oversized Cotton Tee", "price": 599, "mrp": 999, "cat": "Fashion", "img": "https://picsum.photos/seed/tee/500", "desc": "Soft 100% cotton, unisex.", "stock": true },
+    { "id": 4, "name": "Steel Water Bottle 1L", "price": 399, "mrp": 699, "cat": "Home", "img": "https://picsum.photos/seed/bottle/500", "desc": "Leak-proof, keeps cold 12h.", "stock": true }
+  ]
+}
