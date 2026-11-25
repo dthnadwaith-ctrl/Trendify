@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trendify</title>
+<style>
+:root{--bg:#f7f4fb;--card:#fff;--ink:#1d1633;--mute:#6a6482;--line:#e4dff0;--accent:#d9246f;--on:#fff;--ok:#12805c}
+@media (prefers-color-scheme:dark){:root{--bg:#120e1f;--card:#1b1630;--ink:#f1edfb;--mute:#a49dbd;--line:#2c2547;--accent:#ff5a98;--on:#1a0a12;--ok:#4fd1a1}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line)}
+.logo{font-size:1.5rem;font-weight:800;letter-spacing:-.04em;color:var(--accent);text-decoration:none}
+.btn{background:var(--accent);color:var(--on);border:0;border-radius:10px;padding:10px 16px;font-weight:700;transition:transform .15s ease,filter .15s ease,box-shadow .2s ease}
+.btn:hover{filter:brightness(1.07);box-shadow:0 4px 14px rgba(0,0,0,.16)}
+.btn:active{transform:scale(.96)}
+.btn.busy{pointer-events:none;opacity:.85}
+.btn.busy::after{content:"";display:inline-block;width:14px;height:14px;margin-left:8px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;vertical-align:-2px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.screen{animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.center{text-align:center;padding:14px 0}.center h3{margin:0 0 6px;font-size:1.3rem}.center p{color:var(--mute);margin:6px 0}
+.center .btn{display:block;width:100%;margin-top:10px;text-decoration:none}
+.ico{width:96px;height:96px;display:block;margin:6px auto 12px}
+.ring{fill:none;stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:draw .6s ease forwards}
+.mark{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:draw .45s .5s ease forwards}
+.ok{stroke:var(--ok)}.bad{stroke:#e0334c}
+.ico.shake{animation:shake .45s .95s}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pulse{width:84px;height:84px;margin:6px auto 14px;border-radius:50%;display:grid;place-items:center;font-size:2rem;background:var(--line);animation:pulse 1.6s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55)}100%{box-shadow:0 0 0 26px rgba(37,211,102,0)}}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;margin-top:14px;padding:8px}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:.85rem}
+.wrap{max-width:1000px;margin:auto;padding:0 18px}
+.hero{padding:36px 0 10px}
+.hero h1{font-size:clamp(1.9rem,6vw,3rem);line-height:1.08;margin:0 0 8px;letter-spacing:-.03em}
+.hero p{margin:0;color:var(--mute)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+input,select,textarea{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);width:100%}
+.tools input{flex:1;min-width:150px;width:auto}.tools select{width:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:50px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--line)}
+.info{padding:12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.info h3{margin:0;font-size:1rem}.info p{margin:0;color:var(--mute);font-size:.85rem}
+.pr{margin-top:auto;padding-top:6px}.pr b{font-size:1.1rem}.pr s{color:var(--mute);font-size:.85rem;margin:0 6px}.pr em{color:var(--ok);font-style:normal;font-size:.85rem;font-weight:700}
+.empty{grid-column:1/-1;color:var(--mute);text-align:center;padding:36px 0}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(420px,100%);background:var(--card);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s;z-index:20;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer h2{margin:0;padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-size:1.1rem}
+.x{background:none;border:0;color:var(--ink);font-size:1.5rem}
+.body{flex:1;overflow:auto;padding:12px 18px}
+.row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center}
+.row img{width:50px;height:50px;border-radius:8px;object-fit:cover}
+.row .n{flex:1;font-size:.9rem}
+.q{display:flex;gap:6px;align-items:center}.q button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink)}
+.foot{padding:14px 18px max(14px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.ln{display:flex;justify-content:space-between;font-size:.92rem;color:var(--mute)}.ln.t{color:var(--ink);font-weight:800;font-size:1.1rem}
+.shade{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:15;display:none}.shade.open{display:block}
+form label{display:block;font-size:.85rem;color:var(--mute);margin:10px 0 4px}
+.pay{display:flex;gap:10px}.pay label{flex:1;display:flex;gap:8px;align-items:center;margin:0;padding:10px;border:1px solid var(--line);border-radius:10px;color:var(--ink)}.pay input{width:auto}
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:8px}.apps label{display:flex;gap:8px;align-items:center;margin:0;padding:10px;border:1px solid var(--line);border-radius:10px;color:var(--ink)}.apps input{width:auto}
+.err{color:#d12c2c;font-size:.85rem;min-height:1.2em}
+footer{text-align:center;color:var(--mute);font-size:.85rem;padding:24px}footer a{color:var(--mute)}
+.card.adm{padding:16px;margin:14px 0}
+.tabs{display:flex;gap:8px;margin:16px 0}
+.tabs button{flex:1}.tabs .on{background:var(--accent);color:var(--on);border-color:var(--accent)}
+.arow{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.arow img{width:46px;height:46px;border-radius:8px;object-fit:cover}.arow .n{flex:1;font-size:.92rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{background:var(--line);border-radius:10px;padding:10px 12px;font-size:.85rem;color:var(--mute)}
+.hide{display:none!important}
+@media (prefers-reduced-motion:reduce){.drawer,.btn{transition:none}.screen,.pulse,.ico.shake{animation:none}.ring,.mark{animation:none;stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#" id="logo">Trendify</a>
+  <button class="btn" id="openCart">Cart (<span id="count">0</span>)</button>
+</header>
+
+<!-- ================= CUSTOMER ================= -->
+<div id="shop" class="wrap">
+  <section class="hero"><h1 id="tagline"></h1><p id="sub"></p></section>
+  <div class="tools">
+    <input id="search" type="search" placeholder="Search products" aria-label="Search products">
+    <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+  </div>
+  <main class="grid" id="grid"></main>
+</div>
+
+<!-- ================= OWNER ================= -->
+<div id="admin" class="wrap hide">
+  <div id="login" style="max-width:340px;margin:50px auto">
+    <h2>Owner login</h2>
+    <input id="pin" type="password" inputmode="numeric" placeholder="Enter PIN" aria-label="PIN">
+    <p class="err" id="pinErr"></p>
+    <button class="btn" id="pinGo" style="width:100%">Log in</button>
+  </div>
+  <div id="panel" class="hide">
+    <div class="tabs"><button class="btn alt on" data-tab="products">Products</button><button class="btn alt" data-tab="settings">Settings</button></div>
+
+    <div id="t-products">
+      <div class="card adm">
+        <h3 id="formTitle" style="margin-top:0">Add product</h3>
+        <label>Name</label><input id="pName">
+        <div class="two"><div><label>Selling price (₹)</label><input id="pPrice" type="number" inputmode="decimal" min="0"></div>
+        <div><label>MRP (₹, optional)</label><input id="pMrp" type="number" inputmode="decimal" min="0"></div></div>
+        <label>Category</label><input id="pCat" placeholder="e.g. Fashion, Gadgets">
+        <label>Description</label><textarea id="pDesc" rows="2"></textarea>
+        <label>Photo: upload from phone or paste image link</label>
+        <input id="pFile" type="file" accept="image/*"><input id="pImg" placeholder="https://..." style="margin-top:6px">
+        <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="pStock" type="checkbox" checked style="width:auto"> In stock</label>
+        <p class="err" id="pErr"></p>
+        <button class="btn" id="pSave">Save product</button>
+        <button class="btn alt hide" id="pCancel">Cancel edit</button>
+      </div>
+      <div id="alist"></div>
+    </div>
+
+    <div id="t-settings" class="hide">
+      <div class="card adm">
+        <label>Store name</label><input id="sName">
+        <label>Tagline</label><input id="sTag">
+        <label>Sub line</label><input id="sSub">
+        <label>WhatsApp number (91 + 10 digits, no + or spaces)</label><input id="sWa" inputmode="numeric">
+        <label>UPI ID (e.g. name@okhdfcbank)</label><input id="sUpi">
+        <div class="two"><div><label>Free delivery above (₹)</label><input id="sFree" type="number"></div>
+        <div><label>Delivery fee (₹)</label><input id="sFee" type="number"></div></div>
+        <label>Owner PIN</label><input id="sPin" inputmode="numeric">
+        <button class="btn" id="sSave" style="margin-top:14px">Save settings</button>
+      </div>
+    </div>
+
+    <div class="card adm">
+      <h3 style="margin-top:0">Publish your changes</h3>
+      <p class="note">Edits are saved on this phone only. Customers see them after you download <b>products.json</b> and upload it next to index.html on your free host.</p>
+      <button class="btn" id="dl" style="margin-top:10px">Download products.json</button>
+      <button class="btn alt" id="reset" style="margin-top:10px">Discard my edits</button>
+    </div>
+    <button class="btn alt" id="logout">Log out</button>
+  </div>
+</div>
+
+<footer><span id="footer"></span> <a href="#admin">Owner login</a></footer>
+
+<!-- cart -->
+<div class="shade" id="shade"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <h2><span id="dTitle">Your cart</span><button class="x" id="closeCart" aria-label="Close">&times;</button></h2>
+  <div class="body" id="cartView"></div>
+  <div class="foot" id="cartFoot">
+    <div class="ln"><span>Items</span><span id="sub2"></span></div>
+    <div class="ln"><span>Delivery</span><span id="ship"></span></div>
+    <div class="ln t"><span>Total</span><span id="total"></span></div>
+    <button class="btn" id="toCheckout">Checkout</button>
+  </div>
+</aside>
+
+<script>
+const DEFAULT = {
+  settings: { name:"Trendify", tagline:"What's trending, delivered.", sub:"Cash on delivery and UPI. Delivery across India in 5–10 days.",
+    whatsapp:"919999999999", upi:"yourname@upi", freeAbove:499, fee:49, pin:"1234" },
+  products: [
+    { id:1, name:"Wireless Earbuds", price:999, mrp:1999, cat:"Gadgets", img:"https://picsum.photos/seed/earbuds/500", desc:"Bluetooth 5.3, 20h battery.", stock:true },
+    { id:2, name:"Foldable Phone Stand", price:249, mrp:499, cat:"Gadgets", img:"https://picsum.photos/seed/stand/500", desc:"Adjustable aluminium stand.", stock:true },
+    { id:3, name:"Oversized Cotton Tee", price:599, mrp:999, cat:"Fashion", img:"https://picsum.photos/seed/tee/500", desc:"Soft 100% cotton, unisex.", stock:true },
+    { id:4, name:"Steel Water Bottle 1L", price:399, mrp:699, cat:"Home", img:"https://picsum.photos/seed/bottle/500", desc:"Leak-proof, keeps cold 12h.", stock:true }
+  ]
+};
+const $ = id => document.getElementById(id);
+const UPI_APPS = {
+  gpay:   { label:"Google Pay", base:"tez://upi/pay" },
+  phonepe:{ label:"PhonePe",    base:"phonepe://pay" },
+  paytm:  { label:"Paytm",      base:"paytmmp://pay" },
+  fampay: { label:"FamPay",     base:"upi://pay" },
+  any:    { label:"Any UPI app",base:"upi://pay" }
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr = n => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const ls = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+
+let data = JSON.parse(JSON.stringify(DEFAULT));
+let cart = ls.get("tr_cart") || [];
+let authed = false, editId = null, pendingImg = "";
+const S = () => data.settings;
+
+async function load() {
+  try { const r = await fetch("products.json", { cache:"no-store" }); if (r.ok) data = await r.json(); } catch(e){}
+  const draft = ls.get("tr_draft"); if (draft) data = draft;
+  applySettings(); renderGrid(); renderCart(); route();
+}
+const saveDraft = () => ls.set("tr_draft", data);
+
+function applySettings() {
+  document.title = S().name;
+  $("logo").textContent = S().name;
+  $("tagline").textContent = S().tagline;
+  $("sub").textContent = S().sub;
+  $("footer").textContent = "© " + S().name + ".";
+  const cats = [...new Set(data.products.map(p => p.cat).filter(Boolean))];
+  $("cat").innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${esc(c)}</option>`).join("");
+}
+
+/* ---------- customer ---------- */
+function renderGrid() {
+  const q = $("search").value.toLowerCase(), c = $("cat").value;
+  const list = data.products.filter(p => (!c || p.cat === c) && p.name.toLowerCase().includes(q));
+  $("grid").innerHTML = list.length ? list.map(p => {
+    const off = p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+    return `<article class="card"><img src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy">
+      <div class="info"><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p>
+      <div class="pr"><b>${inr(p.price)}</b>${off ? `<s>${inr(p.mrp)}</s><em>${off}% off</em>` : ""}</div>
+      ${p.stock ? `<button class="btn" data-add="${p.id}">Add to cart</button>` : `<button class="btn alt" disabled>Out of stock</button>`}
+      </div></article>`; }).join("") : '<div class="empty">No products found. Try another search.</div>';
+}
+const sums = () => {
+  const sub = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const ship = !sub || sub >= S().freeAbove ? 0 : Number(S().fee);
+  return { sub, ship, total: sub + ship };
+};
+function renderCart() {
+  $("count").textContent = cart.reduce((s,i) => s + i.qty, 0);
+  const t = sums();
+  $("sub2").textContent = inr(t.sub);
+  $("ship").textContent = t.ship ? inr(t.ship) : "Free";
+  $("total").textContent = inr(t.total);
+  $("cartView").innerHTML = cart.length ? cart.map(i => `<div class="row"><img src="${esc(i.img)}" alt="">
+    <div class="n">${esc(i.name)}<br><small>${inr(i.price)}</small></div>
+    <div class="q"><button data-d="-1" data-id="${i.id}" aria-label="Remove one">&minus;</button><span>${i.qty}</span><button data-d="1" data-id="${i.id}" aria-label="Add one">+</button></div></div>`).join("")
+    : '<div class="empty">Your cart is empty. Add a product to start.</div>';
+  $("cartFoot").classList.toggle("hide", !cart.length);
+  ls.set("tr_cart", cart);
+}
+const openDrawer = v => { $("drawer").classList.toggle("open", v); $("shade").classList.toggle("open", v); };
+const showCart = () => { $("dTitle").textContent = "Your cart"; renderCart(); };
+
+function checkoutForm() {
+  $("dTitle").textContent = "Delivery details";
+  $("cartFoot").classList.add("hide");
+  $("cartView").innerHTML = `<form id="co" novalidate>
+    <label>Full name</label><input id="cName" autocomplete="name">
+    <label>Mobile number (10 digits)</label><input id="cPhone" inputmode="numeric" maxlength="10" autocomplete="tel-national">
+    <label>Full address (house, street, area)</label><textarea id="cAddr" rows="2" autocomplete="street-address"></textarea>
+    <div class="two"><div><label>City</label><input id="cCity"></div><div><label>PIN code</label><input id="cPin" inputmode="numeric" maxlength="6"></div></div>
+    <label>State</label><input id="cState">
+    <label>Payment</label>
+    <div class="pay"><label><input type="radio" name="pm" value="COD" checked> Cash on delivery</label><label><input type="radio" name="pm" value="UPI"> UPI</label></div>
+    <div id="apps" class="hide"><label>Pay using</label><div class="apps">${Object.entries(UPI_APPS).map(([k,a],i) => `<label><input type="radio" name="app" value="${k}"${i ? "" : " checked"}> ${a.label}</label>`).join("")}</div></div>
+    <p class="err" id="cErr"></p>
+    <button class="btn" type="submit" style="width:100%">Place order · ${inr(sums().total)}</button>
+    <button class="btn alt" type="button" id="back" style="width:100%;margin-top:8px">Back to cart</button></form>`;
+}
+function placeOrder(e) {
+  e.preventDefault();
+  const v = id => $(id).value.trim();
+  const err = m => { $("cErr").textContent = m; };
+  if (v("cName").length < 2) return err("Enter your full name.");
+  if (!/^[6-9]\d{9}$/.test(v("cPhone"))) return err("Enter a valid 10-digit mobile number.");
+  if (v("cAddr").length < 8) return err("Enter your full address.");
+  if (!v("cCity") || !v("cState")) return err("Enter your city and state.");
+  if (!/^[1-9]\d{5}$/.test(v("cPin"))) return err("Enter a valid 6-digit PIN code.");
+  const pm = document.querySelector('input[name="pm"]:checked').value, t = sums();
+  const appKey = document.querySelector('input[name="app"]:checked').value, app = UPI_APPS[appKey];
+  const id = "TR" + Date.now().toString().slice(-7);
+  const msg = `*New order ${id} - ${S().name}*\n` + cart.map(i => `${i.qty} x ${i.name} - ${inr(i.price * i.qty)}`).join("\n") +
+    `\nDelivery: ${t.ship ? inr(t.ship) : "Free"}\n*Total: ${inr(t.total)}* (${pm === "COD" ? "Cash on delivery" : "UPI via " + app.label})\n\n` +
+    `Name: ${v("cName")}\nMobile: ${v("cPhone")}\nAddress: ${v("cAddr")}, ${v("cCity")}, ${v("cState")} - ${v("cPin")}`;
+  const q = `?pa=${encodeURIComponent(S().upi)}&pn=${encodeURIComponent(S().name)}&am=${t.total}&cu=INR&tn=${id}`;
+  setOrder({ id, msg, total:t.total, pm, appKey, status:"pending", upi:app.base + q, upiAny:"upi://pay" + q, phone:v("cPhone") });
+  window.open(waLink(msg), "_blank");
+  showOrder();
+}
+
+/* ---------- order status screens ---------- */
+let order = ls.get("tr_order");
+const setOrder = o => { order = o; o ? ls.set("tr_order", o) : ls.del("tr_order"); };
+const waLink = m => "https://wa.me/" + S().whatsapp + "?text=" + encodeURIComponent(m);
+const ICON_OK = '<svg class="ico" viewBox="0 0 52 52" aria-hidden="true"><circle class="ring ok" cx="26" cy="26" r="24"/><path class="mark ok" d="M15 27l8 8 15-17"/></svg>';
+const ICON_NO = '<svg class="ico shake" viewBox="0 0 52 52" aria-hidden="true"><circle class="ring bad" cx="26" cy="26" r="24"/><path class="mark bad" d="M17 17l18 18M35 17L17 35"/></svg>';
+function showOrder() {
+  const o = order; if (!o) return showCart();
+  $("cartFoot").classList.add("hide");
+  const app = UPI_APPS[o.appKey], v = $("cartView");
+  if (o.status === "pending") {
+    $("dTitle").textContent = "Send your order";
+    v.innerHTML = `<div class="screen center"><div class="pulse" aria-hidden="true">💬</div>
+      <h3>Almost done!</h3>
+      <p><b>Your order is not confirmed yet.</b> Tap the button, then press <b>Send</b> in WhatsApp.</p>
+      <button class="btn" id="oWa">Open WhatsApp &amp; send order</button>
+      <button class="btn alt" id="oSent">I've sent it</button>
+      <button class="link" id="oCancel">Cancel order</button></div>`;
+  } else if (o.status === "placed") {
+    $("dTitle").textContent = "Order placed";
+    v.innerHTML = `<div class="screen center">${ICON_OK}<h3>Order placed!</h3><p>Order ID <b>${o.id}</b></p>
+      ${o.pm === "UPI" ? `<p>Pay <b>${inr(o.total)}</b> to confirm, then send the payment screenshot on WhatsApp.</p>
+        <a class="btn" href="${o.upi}">Pay with ${app.label}</a>
+        <a class="btn alt" href="${o.upiAny}">Choose another UPI app</a>
+        <p class="note">Or pay manually to UPI ID: <b>${esc(S().upi)}</b></p>`
+        : `<p>Pay <b>${inr(o.total)}</b> in cash when your order arrives.</p>`}
+      <button class="btn alt" id="oDone">Continue shopping</button>
+      <button class="link" id="oCancel">Cancel order</button></div>`;
+  } else {
+    $("dTitle").textContent = "Order cancelled";
+    v.innerHTML = `<div class="screen center">${ICON_NO}<h3>Order cancelled</h3><p>Order ID <b>${o.id}</b></p>
+      ${o.wasPlaced ? `<p>Please send the cancellation message on WhatsApp so the store knows. If you already paid by UPI, ask about your refund there.</p>
+        <button class="btn" id="oCancelWa">Send cancellation on WhatsApp</button>` : `<p>Nothing was sent to the store. Your cart is still saved.</p>`}
+      <button class="btn alt" id="oDone">Back to shop</button></div>`;
+  }
+}
+const cancelMsg = o => `*Cancel order ${o.id} - ${S().name}*\nPlease cancel my order ${o.id}.\nMobile: ${o.phone}`;
+function orderClick(id, btn) {
+  const o = order;
+  if (id === "oWa") { btn.classList.add("busy"); setTimeout(() => btn.classList.remove("busy"), 1500); window.open(waLink(o.msg), "_blank"); }
+  else if (id === "oSent") { btn.classList.add("busy"); setTimeout(() => { o.status = "placed"; setOrder(o); cart = []; renderCart(); showOrder(); }, 600); }
+  else if (id === "oCancel") {
+    if (!confirm("Cancel this order?")) return;
+    const was = o.status === "placed";
+    o.status = "cancelled"; o.wasPlaced = was; setOrder(o);
+    if (was) window.open(waLink(cancelMsg(o)), "_blank");
+    showOrder();
+  }
+  else if (id === "oCancelWa") window.open(waLink(cancelMsg(o)), "_blank");
+  else if (id === "oDone") { setOrder(null); openDrawer(false); showCart(); }
+}
+
+/* ---------- owner ---------- */
+function renderAdmin() {
+  $("alist").innerHTML = data.products.length ? data.products.map(p => `<div class="arow"><img src="${esc(p.img)}" alt="">
+    <div class="n"><b>${esc(p.name)}</b><br>${inr(p.price)} ${p.stock ? "" : "· out of stock"}</div>
+    <button class="btn alt sm" data-edit="${p.id}">Edit</button><button class="btn alt sm" data-del="${p.id}">Delete</button></div>`).join("")
+    : '<div class="empty">No products yet. Add your first product above.</div>';
+  const s = S();
+  $("sName").value = s.name; $("sTag").value = s.tagline; $("sSub").value = s.sub; $("sWa").value = s.whatsapp;
+  $("sUpi").value = s.upi; $("sFree").value = s.freeAbove; $("sFee").value = s.fee; $("sPin").value = s.pin;
+}
+function clearForm() {
+  editId = null; pendingImg = "";
+  ["pName","pPrice","pMrp","pCat","pDesc","pImg"].forEach(i => $(i).value = ""); $("pFile").value = ""; $("pStock").checked = true;
+  $("formTitle").textContent = "Add product"; $("pCancel").classList.add("hide"); $("pErr").textContent = "";
+}
+function saveProduct() {
+  const name = $("pName").value.trim(), price = Number($("pPrice").value);
+  if (!name || !(price > 0)) { $("pErr").textContent = "Enter a name and a selling price above 0."; return; }
+  const img = pendingImg || $("pImg").value.trim() || "https://picsum.photos/seed/" + encodeURIComponent(name) + "/500";
+  const p = { id: editId || Date.now(), name, price, mrp: Number($("pMrp").value) || 0, cat: $("pCat").value.trim(),
+    desc: $("pDesc").value.trim(), img, stock: $("pStock").checked };
+  const i = data.products.findIndex(x => x.id === p.id);
+  i >= 0 ? data.products[i] = p : data.products.unshift(p);
+  saveDraft(); clearForm(); applySettings(); renderGrid(); renderAdmin();
+}
+function resizeImage(file) {
+  const r = new FileReader();
+  r.onload = () => { const im = new Image(); im.onload = () => {
+    const k = Math.min(1, 600 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+    c.width = im.width * k; c.height = im.height * k; c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+    pendingImg = c.toDataURL("image/jpeg", .75); }; im.src = r.result; };
+  r.readAsDataURL(file);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target, a = t.closest("[data-add]");
+  if (a) { const p = data.products.find(x => x.id == a.dataset.add), ex = cart.find(x => x.id === p.id);
+    ex ? ex.qty++ : cart.push({ id:p.id, name:p.name, price:p.price, img:p.img, qty:1 }); if (order && order.status !== "placed") setOrder(null); showCart(); openDrawer(true); return; }
+  const d = t.closest("[data-d]");
+  if (d) { const it = cart.find(x => x.id == d.dataset.id); it.qty += +d.dataset.d; if (it.qty <= 0) cart = cart.filter(x => x !== it); renderCart(); return; }
+  const ed = t.closest("[data-edit]");
+  if (ed) { const p = data.products.find(x => x.id == ed.dataset.edit); editId = p.id; pendingImg = "";
+    $("pName").value = p.name; $("pPrice").value = p.price; $("pMrp").value = p.mrp || ""; $("pCat").value = p.cat; $("pDesc").value = p.desc;
+    $("pImg").value = p.img.startsWith("data:") ? "" : p.img; $("pStock").checked = p.stock;
+    pendingImg = p.img.startsWith("data:") ? p.img : "";
+    $("formTitle").textContent = "Edit product"; $("pCancel").classList.remove("hide"); scrollTo({ top:0, behavior:"smooth" }); return; }
+  const dl = t.closest("[data-del]");
+  if (dl && confirm("Delete this product?")) { data.products = data.products.filter(x => x.id != dl.dataset.del); saveDraft(); applySettings(); renderGrid(); renderAdmin(); return; }
+  const tab = t.closest("[data-tab]");
+  if (tab) { document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("on", b === tab));
+    $("t-products").classList.toggle("hide", tab.dataset.tab !== "products"); $("t-settings").classList.toggle("hide", tab.dataset.tab !== "settings"); return; }
+  if (t.id === "back") showCart();
+  const ob = t.closest("button[id^='o']"); if (ob && ["oWa","oSent","oCancel","oCancelWa","oDone"].includes(ob.id)) orderClick(ob.id, ob);
+});
+document.addEventListener("submit", e => { if (e.target.id === "co") placeOrder(e); });
+document.addEventListener("change", e => { if (e.target.name === "pm") $("apps").classList.toggle("hide", e.target.value !== "UPI"); });
+$("openCart").onclick = () => { order && (order.status === "pending" || !cart.length) ? showOrder() : showCart(); openDrawer(true); };
+$("closeCart").onclick = $("shade").onclick = () => openDrawer(false);
+$("toCheckout").onclick = checkoutForm;
+$("search").oninput = $("cat").onchange = renderGrid;
+$("pSave").onclick = saveProduct; $("pCancel").onclick = clearForm;
+$("pFile").onchange = e => e.target.files[0] && resizeImage(e.target.files[0]);
+$("pinGo").onclick = () => { if ($("pin").value === String(S().pin)) { authed = true; $("pin").value = ""; $("pinErr").textContent = ""; route(); } else $("pinErr").textContent = "Wrong PIN. Try again."; };
+$("logout").onclick = () => { authed = false; location.hash = ""; };
+$("sSave").onclick = () => { Object.assign(S(), { name:$("sName").value.trim() || "Trendify", tagline:$("sTag").value, sub:$("sSub").value, whatsapp:$("sWa").value.replace(/\D/g,""),
+  upi:$("sUpi").value.trim(), freeAbove:Number($("sFree").value) || 0, fee:Number($("sFee").value) || 0, pin:$("sPin").value.trim() || "1234" });
+  saveDraft(); applySettings(); renderCart(); alert("Settings saved on this phone. Download products.json to publish."); };
+$("dl").onclick = () => { const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type:"application/json" })); a.download = "products.json"; a.click(); };
+$("reset").onclick = () => { if (confirm("Discard all edits made on this phone?")) { ls.del("tr_draft"); location.reload(); } };
+
+function route() {
+  const adm = location.hash === "#admin";
+  $("shop").classList.toggle("hide", adm); $("admin").classList.toggle("hide", !adm);
+  $("login").classList.toggle("hide", authed); $("panel").classList.toggle("hide", !authed);
+  if (adm && authed) renderAdmin();
+}
+addEventListener("hashchange", route);
+load();
+</script>
+</body>
+</html>
